@@ -1,0 +1,81 @@
+#ifdef RAK12059_MODULE
+
+#include "Arduino.h"
+#include "ADC_SGM58031.h" //http://librarymanager/All#RAKwireless_ADC_SGM58031_library
+#define ALERT_PIN     WB_IO1  //SlotA installation, please do not use it on SLOTB
+
+
+RAK_ADC_SGM58031 sgm58031(SGM58031_SDA_ADDRESS);
+
+#define EPISON 1e-7
+
+//If you use 8 inches, use this code
+#define REF 1500.0
+#define RESISTANCE_MAX 1657.0
+#define RESISTANCE 1100.0
+#define LENGTH 7.0
+
+bool  interrupt_flag = false;
+void RAK12059_test(unsigned long timeout)
+{
+  // put your setup code here, to run once:
+  pinMode(WB_IO2, OUTPUT);
+  digitalWrite(WB_IO2, HIGH);
+
+  sgm58031.begin();
+  if (sgm58031.getChipID() != DEVICE_ID)
+  {
+    Serial.printf("RAK12059 Test Failed\n"); 
+    return;
+  }
+  else
+  {
+    sgm58031.setAlertLowThreshold(0x0000);  // Write  0x0000  to Lo_Thresh
+    sgm58031.setAlertHighThreshold(0x7FFF); // Write 0x7FFF to Hi_Thresh
+    sgm58031.setConfig(0xC2E0);             // Write config, OS=1, AIN0 to GND, G=(+/-4.096V input range)
+    sgm58031.setVoltageResolution(SGM58031_FS_4_096);
+  }  
+  float gVoltage = sgm58031.getVoltage();
+  Serial.print(F("gVoltage="));
+  Serial.print(gVoltage);
+  Serial.println("V");
+  if((gVoltage> 3.2) && (gVoltage < 3.4))
+  {
+    Serial.printf("RAK12059 Test OK\n");
+    return;
+  }
+  else 
+  {
+    Serial.printf("RAK12059 Test Failed\n");   
+    return;
+  }
+}
+#endif
+
+
+
+
+
+/*#define SWITCH_PIN   WB_IO1 //SlotA installation, please do not use it on SLOTB and SLOTD
+//#define SWITCH_PIN WB_IO3 //SlotC installation.
+
+void RAK13011_test(unsigned long timeout)
+{
+  pinMode(SWITCH_PIN, INPUT_PULLDOWN);
+
+  time_t time_now = millis();
+  
+  while ((millis() - time_now) < 5000)
+  {
+    if (digitalRead(SWITCH_PIN) == LOW)
+    {
+      Serial.printf("RAK13011 Test OK\n");
+      return; 
+    }
+    delay(10);
+  }
+  Serial.printf("RAK13011 Test Failed\n");  
+  return;
+}
+
+#endif*/
