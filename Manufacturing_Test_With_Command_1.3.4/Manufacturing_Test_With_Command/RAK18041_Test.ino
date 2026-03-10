@@ -3,6 +3,11 @@
 #include "Production_test_configure.h"
 #include <I2S.h>          // Arduino I2S 库
 #include "audio.h"        // NAU85L40B 驱动库，请确保已安装
+/*
+*   note: 相关依赖库使用同名变量/类名，导致冲突。现针对产测固件依赖库的 RAKwireless-Audio-library 做出修改：
+*         SoftwareIIC.h/SoftwareIIC.cpp/tpt29555.cpp/tas2560.cpp/NAU85L40B.cpp 的 IOIIC==》IOIIC_Audio
+*         dspg.cpp/dspg.h 的   SPI_USER==》SPI_USER_Audio  
+*/
 
 #define I2S_DATA_BLOCK_WORDS  512
 
